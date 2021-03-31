@@ -3,6 +3,17 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'reset-css'
+import 'animate.css'
+import Element from 'element-ui'
+// import {
+//   Select,
+//   Button
+//   // ...
+// } from 'element-ui'
+
+Vue.use(Element)
+//  Vue.component(Select.name, Select)
 
 Vue.config.productionTip = false
 
