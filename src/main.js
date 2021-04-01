@@ -5,7 +5,9 @@ import App from './App'
 import router from './router'
 import 'reset-css'
 import 'animate.css'
-import Element from 'element-ui'
+// import Element from 'element-ui'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -18,9 +20,9 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 //   // ...
 // } from ' element-ui'
 library.add(fas, far)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('fas-icon', FontAwesomeIcon)
 
-Vue.use(Element)
+Vue.use(ElementUI)
 //  Vue.component(Select.name, Select)
 
 Vue.config.productionTip = false
