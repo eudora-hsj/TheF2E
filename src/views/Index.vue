@@ -1,5 +1,5 @@
 <template lang="pug">
-  .index
+  .index.container
     h2.animate__animated.animate__shakeX
       | The F2E | Eudora
     ul
@@ -41,6 +41,8 @@ export default {
 
 <style lang="scss">
 .index {
+  margin: auto;
+  text-align: center;
   ul {
     margin: 1rem auto;
     display: inline-block;
