@@ -1,7 +1,5 @@
-<template>
-  <div class="container">
-    {{msg}}
-  </div>
+<template lang="pug">
+  .container {{msg}}
 </template>
 
 <script>

@@ -1,14 +1,11 @@
-<template>
-  <div class="index">
-    <h2 class="animate__animated animate__shakeX">The F2E | Eudora</h2>
-    <ul>
-      <li v-for="page in pages" :key="page.path">
-        <router-link :to="'/'+page.path">
-          {{page.path}}：{{page.subject}}
-        </router-link>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  .index
+    h2.animate__animated.animate__shakeX
+      | The F2E | Eudora
+    ul
+      li(v-for="page in pages" :key="page.path")
+        router-link(:to="'/'+page.path")
+          | {{page.path}}：{{page.subject}}
 </template>
 
 <script>
