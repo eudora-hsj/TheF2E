@@ -8,13 +8,16 @@
           | {{listPage.name}}
     .content
       .panel-add
-        el-input.add-task(v-model="cacheTask.name" placeholder="＋Add Task"
-                          @focus="isAdd = true" @keyup.enter.native="addTask")
-      .panel-editor(v-show="isAdd")
+        el-input.add-task(v-if="isEdit" placeholder="＋Add Task"
+                          @focus="!cacheTask.name ? isAdd = true : ''" @keyup.enter.native="addTask")
+        el-input.add-task(v-else v-model="cacheTask.name" placeholder="＋Add Task"
+                          @focus="!cacheTask.name ? isAdd = true : ''" @keyup.enter.native="addTask")
+      .panel-editor(v-show="isAdd || isEdit")
         section.editor-title.task-title
           p.task-input
-            input(type="checkbox")
-            input(type="text" v-model="cacheTask.name" placeholder="Type Something Here" class="input")
+            <el-checkbox v-model="cacheTask.isCompleted" @click="cacheTask.isCompleted = !cacheTask.isCompleted">
+            </el-checkbox>
+            input.input(type="text" v-model="cacheTask.name" placeholder="Type Something Here" @keyup.enter="addTask")
           p.task-btns
             button.btn-important
               fas-icon(:icon="[cacheTask.isStart ? 'fas' : 'far', 'star']"
@@ -36,23 +39,23 @@
           | Comment
           el-input(type="textarea" :rows="2" placeholder="Type your memo here…" v-model="cacheTask.comment")
         .editor-btns
-          button.cancle
+          button.cancle(@click="cancleEditAddTask")
             fas-icon(icon="times")
             |  Cancel
-          button.add(@click="addTask")
+          button.add(v-show="isAdd && !isEdit" @click="addTask")
             fas-icon(icon="plus")
             |  Add Task
-          button.update(@click="updateTask")
+          button.update(v-show="isEdit && !isAdd" @click="updateTask")
             fas-icon(icon="plus")
             |  SAVE
       .panel-list
-        .task(v-for="(task, idx) in filteredTasks" :class="{'completed': task.isCompleted, 'edit': task.isEdit}")
+        .task(v-for="(task, idx) in filteredTasks" :class="{'completed': task.isCompleted, 'edit': cacheTask.id === task.id}")
           .task-title
             p.task-input
-              input(type="checkbox" :checked="task.isCompleted"
-                    @click="task.isCompleted = !task.isCompleted")
-              input(type="text" placeholder="Type Something Here" class="input" :value="task.name" :readonly="!task.isEdit"
-                    @click="task.isEdit = !task.isEdit")
+              <el-checkbox v-model="task.isCompleted" @click="task.isCompleted = !task.isCompleted">
+              </el-checkbox>
+              input(type="text" placeholder="Type Something Here" class="input" :value="task.name" readonly
+                    @dblclick="editTask(task); task.isEdit = !task.isEdit")
             p.task-btns
               button.btn-important
                 fas-icon(:icon="[task.isStart && !task.isCompleted ? 'fas' : 'far', 'star']"
@@ -66,13 +69,12 @@
             span.info-date(v-if="task.date")
               fas-icon(:icon="['far', 'calendar-alt']")
               | {{task.date}}
-            //- span.info-date
-              //- fas-icon(:icon="['far', 'file']")
-              //- | {{task.file}}
             span.info-comment(v-if="task.comment")
               fas-icon(:icon="['far', 'comment-dots']")
       .panel-count
-        p {{progressTasksCount}} tasks left
+        span {{progressTasksCount}} tasks left
+        button.btn-del(@click="delTasks(task)")
+          fas-icon(icon="trash-alt")
 </template>
 
 <script>
@@ -97,48 +99,21 @@ export default {
       ],
       currentListPage: 'all',
       isAdd: false,
-      cacheTask: {
-        id: null,
-        name: '',
-        isStart: false,
-        date: '',
-        // time: '10:00',
-        comment: null,
-        isCompleted: false,
-        isEdit: false
+      isEdit: false,
+      cacheTask: {},
+      tasks: []
+    }
+  },
+  created () {
+    this.dataLoad()
+    this.defaultCacheTask()
+  },
+  watch: {
+    tasks: {
+      handler: function () {
+        this.dataUpdate()
       },
-      tasks: [
-        {
-          id: 1,
-          name: 'task1',
-          isStart: false,
-          date: '',
-          // time: '08:00',
-          comment: 'balabala',
-          isCompleted: true,
-          isEdit: false
-        },
-        {
-          id: 2,
-          name: 'task2',
-          isStart: false,
-          date: '',
-          // time: '13:00',
-          comment: 'balabala',
-          isCompleted: false,
-          isEdit: false
-        },
-        {
-          id: 3,
-          name: 'task3',
-          isStart: false,
-          date: '',
-          // time: '10:00',
-          comment: null,
-          isCompleted: false,
-          isEdit: false
-        }
-      ]
+      deep: true
     }
   },
   computed: {
@@ -158,6 +133,26 @@ export default {
     }
   },
   methods: {
+    dataLoad () {
+      let localDb = JSON.parse(localStorage.getItem('tasks'))
+      localDb ? this.tasks = localDb : this.dataUpdate()
+    },
+    dataUpdate () {
+      localStorage.setItem('tasks', JSON.stringify(this.tasks))
+    },
+    defaultCacheTask () {
+      this.cacheTask = {
+        id: null,
+        name: null,
+        isStart: false,
+        date: null,
+        comment: null,
+        isCompleted: false
+      }
+    },
+    getIdx (id) {
+      return this.tasks.findIndex((task) => task.id === id)
+    },
     addTask () {
       let newTaskName = this.cacheTask.name ? this.cacheTask.name.trim() : ''
       if (!newTaskName) { return }
@@ -170,21 +165,33 @@ export default {
         isCompleted: false
       }
       this.tasks.push(submitData)
-      this.cacheTask = {}
+      this.defaultCacheTask()
     },
-    getIdx (curTaskId) {
-      return this.tasks.findIndex((task) => task.id === curTaskId)
+    cancleEditAddTask () {
+      if (this.isAdd) {
+        this.isAdd = false
+      } else {
+        this.cancleEditAddTask()
+      }
     },
     delTask (curTask) {
       this.tasks.splice(this.getIdx(curTask.id), 1)
+      this.defaultCacheTask()
+    },
+    delTasks () {
+      this.tasks = []
     },
     editTask (curTask) {
-      this.tasks.forEach(task => (task.isEdit = false))
+      this.isAdd = false
+      this.isEdit = true
       this.cacheTask = curTask
     },
-    updateTask () {
-      // todo
-      this.cacheTask = {}
+    updateTask (curTask) {
+      this.cacheTask.isEdit = false
+      this.tasks[this.getIdx(this.cacheTask.id)] = this.cacheTask
+      this.defaultCacheTask()
+      this.isAdd = true
+      this.isEdit = false
     }
   }
 }
@@ -293,14 +300,12 @@ button {  // button style reset
         display: none;
       }
       .task-title {
-        input[type="text"]{
+        input[type="text"] {
           text-decoration:line-through;
           border: none;  //test
           background: none; //test
           color: #AAA;
         }
-
-        // background-color: #CCC;
       }
     }
   }
@@ -338,7 +343,8 @@ button {  // button style reset
           background-color: #fff;
           color: var(--color-red-1);
         }
-        &.add {
+        &.add ,
+        &.update {
           background-color: var(--color-blue-1);
           color: white;
         }
@@ -352,6 +358,13 @@ button {  // button style reset
       background-color: var(--color-gray-4);
       .task-input {
         margin-left: -24px;
+      }
+      input[readonly] {
+        border: none;  //test
+        background: none; //test
+      }
+      &.edit {
+        background-color: var(--color-yellow-2);
       }
     }
   }
