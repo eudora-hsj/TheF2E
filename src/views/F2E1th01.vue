@@ -3,20 +3,19 @@
     .banner
       ul
         li(v-for="listPage in listPages" :key="listPage.value"
-            :class="{'active': currentListPage===listPage.value}"
+            :class="{'active': currentListPage === listPage.value}"
             @click="currentListPage=listPage.value")
           | {{listPage.name}}
     .content
       .panel-add
-        el-input.add-task(v-if="isEdit" placeholder="＋Add Task"
-                          @focus="!cacheTask.name ? isAdd = true : ''" @keyup.enter.native="addTask")
+        el-input.add-task(v-if="editStatus === 'edit'" placeholder="＋Add Task"
+                          @focus="defaultCacheTask(); editStatus = 'add';" @keyup.enter.native="addTask")
         el-input.add-task(v-else v-model="cacheTask.name" placeholder="＋Add Task"
-                          @focus="!cacheTask.name ? isAdd = true : ''" @keyup.enter.native="addTask")
-      .panel-editor(v-show="isAdd || isEdit")
+                          @focus="editStatus = 'add'" @keyup.enter.native="addTask")
+      .panel-editor(v-show="editStatus")
         section.editor-title.task-title
           p.task-input
-            <el-checkbox v-model="cacheTask.isCompleted" @click="cacheTask.isCompleted = !cacheTask.isCompleted">
-            </el-checkbox>
+            el-checkbox(v-model="cacheTask.isCompleted" @click="cacheTask.isCompleted = !cacheTask.isCompleted")
             input.input(type="text" v-model="cacheTask.name" placeholder="Type Something Here" @keyup.enter="addTask")
           p.task-btns
             button.btn-important
@@ -25,37 +24,38 @@
             button.btn-edit
               fas-icon(icon="pen")
         section.editor-date
-          fas-icon(:icon="['far', 'calendar-alt']")
-          | Deadline
-          el-date-picker(v-model="cacheTask.date" type="date" placeholder="yyyy/mm/dd" format="yyyy/mm/dd").
-          //- el-time-select(v-model="cacheTask.time" :picker-options="{start: \'08:30\',step: \'00:15\',end: \'18:30\'}" placeholder="hh/mm").
+          p
+            fas-icon(:icon="['far', 'calendar-alt']")
+            | Deadline
+          el-date-picker(v-model="cacheTask.date" type="date" placeholder="yyyy/mm/dd" format="yyyy/MM/dd").
+          //- el-time-select(v-model="cacheTask.time" :picker-options="{start: \'08:30\',step: \'00:15\',end: \'18:30\'}" placeholder="time").
         //- section.editor-file
         //-   fas-icon(:icon="['far', 'file']")
         //-   | File
         //-   el-button(type='info') 
         //-     fas-icon(:icon="['fas', 'plus']")
         section.editor-comment
-          fas-icon(:icon="['far', 'comment-dots']")
-          | Comment
+          p
+            fas-icon(:icon="['far', 'comment-dots']")
+            | Comment
           el-input(type="textarea" :rows="2" placeholder="Type your memo here…" v-model="cacheTask.comment")
         .editor-btns
           button.cancle(@click="cancleEditAddTask")
             fas-icon(icon="times")
-            |  Cancel
-          button.add(v-show="isAdd && !isEdit" @click="addTask")
+            | Cancel
+          button.add(v-show="editStatus === 'add'" @click="addTask")
             fas-icon(icon="plus")
-            |  Add Task
-          button.update(v-show="isEdit && !isAdd" @click="updateTask")
+            | Add Task
+          button.update(v-show="editStatus === 'edit'" @click="updateTask")
             fas-icon(icon="plus")
-            |  SAVE
+            | SAVE
       .panel-list
         .task(v-for="(task, idx) in filteredTasks" :class="{'completed': task.isCompleted, 'edit': cacheTask.id === task.id}")
           .task-title
             p.task-input
-              <el-checkbox v-model="task.isCompleted" @click="task.isCompleted = !task.isCompleted">
-              </el-checkbox>
+              el-checkbox(v-model="task.isCompleted" @click="task.isCompleted = !task.isCompleted")
               input(type="text" placeholder="Type Something Here" class="input" :value="task.name" readonly
-                    @dblclick="editTask(task); task.isEdit = !task.isEdit")
+                    @dblclick="editTask(task); editStatus = null || 'edit'")
             p.task-btns
               button.btn-important
                 fas-icon(:icon="[task.isStart && !task.isCompleted ? 'fas' : 'far', 'star']"
@@ -72,8 +72,8 @@
             span.info-comment(v-if="task.comment")
               fas-icon(:icon="['far', 'comment-dots']")
       .panel-count
-        span {{progressTasksCount}} tasks left
-        button.btn-del(@click="delTasks(task)")
+        span {{filteredTasksCount}}  {{filteredTasksMsg}}
+        button.btn-del(@click="delTasks()")
           fas-icon(icon="trash-alt")
 </template>
 
@@ -98,8 +98,8 @@ export default {
         }
       ],
       currentListPage: 'all',
-      isAdd: false,
-      isEdit: false,
+      filteredTasksMsg: '',
+      editStatus: null, // add / edit / null'
       cacheTask: {},
       tasks: []
     }
@@ -114,6 +114,12 @@ export default {
         this.dataUpdate()
       },
       deep: true
+    },
+    currentListPage: {
+      immediate: true,
+      handler: function () {
+        this.filteredTasksMsg = this.currentListPage === 'completed' ? 'task completed' : 'tasks left'
+      }
     }
   },
   computed: {
@@ -127,6 +133,9 @@ export default {
         case 'completed':
           return this.tasks.filter(task => task.isCompleted)
       }
+    },
+    filteredTasksCount () {
+      return this.filteredTasks.length
     },
     progressTasksCount () {
       return this.tasks.filter(task => (!task.isCompleted)).length
@@ -144,9 +153,10 @@ export default {
       this.cacheTask = {
         id: null,
         name: null,
-        isStart: false,
         date: null,
+        // time: null,
         comment: null,
+        isStart: false,
         isCompleted: false
       }
     },
@@ -168,11 +178,8 @@ export default {
       this.defaultCacheTask()
     },
     cancleEditAddTask () {
-      if (this.isAdd) {
-        this.isAdd = false
-      } else {
-        this.cancleEditAddTask()
-      }
+      this.cacheTask.name ? this.defaultCacheTask() : this.editStatus = null
+      if (this.editStatus) this.defaultCacheTask()
     },
     delTask (curTask) {
       this.tasks.splice(this.getIdx(curTask.id), 1)
@@ -180,18 +187,16 @@ export default {
     },
     delTasks () {
       this.tasks = []
+      this.dataUpdate()
     },
     editTask (curTask) {
-      this.isAdd = false
-      this.isEdit = true
+      this.editStatus = 'edit'
       this.cacheTask = curTask
     },
     updateTask (curTask) {
-      this.cacheTask.isEdit = false
       this.tasks[this.getIdx(this.cacheTask.id)] = this.cacheTask
       this.defaultCacheTask()
-      this.isAdd = true
-      this.isEdit = false
+      this.editStatus = 'add'
     }
   }
 }
@@ -201,7 +206,7 @@ export default {
 :root {
   --color-blue-1: #4A90E2;
   --color-blue-2: #00408B;
-  --color-red-2: ##D0021B;
+  --color-red-1: #D0021B;
   --color-yellow-1: #F5A623;
   --color-yellow-2: #FFF2DC;
   --color-gray-1: #757575;
@@ -246,12 +251,16 @@ button {  // button style reset
 }
 
 .f2e1-01 {
-  background-color: var(--color-gray-3);
-  @extend %mh-100vh;
-  @extend %mg-auto;
-  // * {
-  //   outline: 1px solid red;  //test
-  // }
+  &.container{
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--color-gray-3);
+    @extend %mh-100vh;
+    @extend %mg-auto;
+    // * {
+    //   outline: 1px solid red;  //test
+    // }
+
+  }
   .banner {
     background-color: var(--color-blue-1);
     ul {
@@ -261,13 +270,13 @@ button {  // button style reset
       li {
         @extend %text-center;
         color: var(--color-sub);
-        font-weight: bold;
         line-height: 2.2rem;
         font-size: 1rem;
         flex: 1;
         cursor: pointer;
         &.active{
           color: #fff;
+          font-weight: bold;
           border-bottom: 3px solid var(--color-blue-2);
         }
         &:hover{
@@ -332,25 +341,49 @@ button {  // button style reset
   .btn-important svg[data-prefix="fas"] {
     color: var(--color-yellow-1);
   }
-  .panel-add {}
+  // .panel-add {}
   .panel-editor {
     background-color: var(--color-gray-4);
-
+    .editor-title {
+      border-bottom: 1px solid #ddd;
+      font-size: 2rem;
+      padding: 15px 20px;
+    }
+    .editor-date,
+    .editor-comment {
+      padding: 13px 40px;
+      p{
+        line-height: 2rem;
+      }
+      svg {
+        margin-right: 5px;
+        margin-left: -20px;
+      }
+    }
     .editor-btns {
       button {
         @extend %w50;
+        padding: 10px;
         &.cancle {
           background-color: #fff;
           color: var(--color-red-1);
         }
-        &.add ,
+        &.add,
         &.update {
           background-color: var(--color-blue-1);
           color: white;
         }
+        &:hover {
+          cursor: pointer;
+          filter: brightness(1.1);
+        }
+        svg {
+          margin-right: 5px;
+        }
       }
     }
   }
+  .panel-editor,
   .panel-list {
     .task {
       margin: 10px auto;
@@ -365,6 +398,17 @@ button {  // button style reset
       }
       &.edit {
         background-color: var(--color-yellow-2);
+      }
+    }
+  }
+  .panel-list {
+    .task-btns {
+      svg {
+        color: var(--color-gray-1);
+        &:hover{
+          cursor: pointer;
+          filter: brightness(0.2);
+        }
       }
     }
   }
