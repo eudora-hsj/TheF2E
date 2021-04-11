@@ -19,6 +19,11 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 //   Button
 //   // ...
 // } from ' element-ui'
+import axios from 'axios'
+
+Vue.prototype.$http = axios
+Vue.prototype.HOST = '/api'
+
 library.add(fas, far)
 Vue.component('fas-icon', FontAwesomeIcon)
 
