@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container {{msg}}
+  .content {{msg}}
 </template>
 
 <script>

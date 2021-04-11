@@ -1,5 +1,5 @@
 <template lang="pug">
-  .index.container
+  .index.content
     h2.animate__animated.animate__shakeX
       | The F2E | Eudora
     ul

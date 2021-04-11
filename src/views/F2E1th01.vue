@@ -1,5 +1,5 @@
 <template lang="pug">
-  .f2e1-01.container
+  .f2e1-01.content
     .banner
       ul
         li(v-for="listPage in listPages" :key="listPage.value"
@@ -245,18 +245,8 @@ export default {
 </script>
 
 <style lang="scss">
-// custom-default style
-button {  // button style reset
-  border: none;
-  background: none;
-}
-* {
-  box-sizing: border-box;
-}
-
-// layout - ariables
-
-:root {
+// style
+.f2e1-01 {
   --color-blue-1: #4A90E2;
   --color-blue-2: #00408B;
   --color-red-1: #D0021B;
@@ -267,14 +257,20 @@ button {  // button style reset
   --color-gray-3: #E1E1E1;
   --color-gray-4: #F2F2F2;
   --width-content-max: 620px;
-  font-size: 12px;
-}
-
-// style
-
-.f2e1-01 {
   font-size: 1rem;
-  &.container{
+  // custom-mixin
+  %max-width {
+    max-width: var(--width-content-max);
+  }
+  // custom-default style
+  button {  // button style reset
+    border: none;
+    background: none;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  &.content{
     font-family: 'Roboto', sans-serif;
     background-color: var(--color-gray-3);
     @extend %mh-100vh;
