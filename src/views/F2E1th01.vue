@@ -349,7 +349,7 @@ button {  // button style reset
     }
     .task-btns {
       button {
-        @include size-w-h(2.2rem);
+        @include size(2.2rem);
       }
     }
   }

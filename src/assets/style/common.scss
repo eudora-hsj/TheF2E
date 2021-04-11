@@ -1,33 +1,175 @@
-// common style (mixin / extend)
+// layout
 %max-width {
     max-width: var(--width-content-max);
 }
-
-%mg-auto {
-    margin: auto;
+// reset
+%border-box {
+    box-sizing: border-box;
 }
-
-%w100 {
-    width: 100%;
+// flex
+@mixin flex-j-a($j: center, $a: center) {
+    display: flex;
+    justify-content: $j;
+    align-items: $a;
 }
-
-%mh-100vh {
-    min-height: 100vh;
-}
-
-%w50 {
-    width: 50%;
-}
-
-%text-center {
-    text-align: center;
-}
-
 %flex {
     display: flex;
 }
-
-@mixin size-w-h($width, $height:$width) {
-    width: $width;
-    height: $height;
+%justify-content-center {
+    justify-content: center;
+}
+%justify-content-between {
+    justify-content: space-between;
+}
+%justify-content-evenly {
+    justify-content: space-evenly;
+}
+%justify-content-end {
+    justify-content: flex-end;
+}
+%align-items-center {
+    align-items: center;
+}
+%align-items-start {
+    align-items: flex-start;
+}
+%flex-grow {
+    flex: 1 0 auto;
+}
+%flex-wrap {
+    @extend %flex;
+    flex-wrap: wrap;
+}
+%flex-nowrap {
+    @extend %flex;
+    flex-wrap: nowrap;
+}
+%flex-row {
+    @extend %flex;
+    flex-direction: row;
+}
+%flex-column {
+    @extend %flex;
+    flex-direction: column;
+}
+%flex-xy-center {
+    @extend %flex;
+    @extend %justify-content-center;
+    @extend %align-items-center ;
+}
+%flex-col {
+    position: relative;
+    flex-basis: 0;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 100%;
+}
+%flex-col-auto {
+    position: relative;
+    flex: 0 0 auto;
+    max-width: 100%;
+}
+// absoulute
+%abs{
+    position: absolute;
+}
+@mixin abpos($l: initial, $t: initial) {
+    @extend %abs;
+    left: $l;
+    top: $t;
+}
+%abs-x-center {
+    @extend %abs;
+    left: 50%;
+    transform: translateX(-50%);
+}
+%abs-y-center {
+    @extend %abs;
+    top: 50%;
+    transform: translateY(-50%);
+}
+%abs-center {
+    @extend %abs;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+%abpos-0{
+    @extend %abs;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+@mixin flex-box($dr: row, $wr: wrap, $jc: flex-start, $ai: stretch, $ac: stretch) {
+    display: flex;
+    flex-direction: $dr;
+    flex-wrap: $wr;
+    justify-content: $jc;
+    align-items: $ai;
+    align-content: $ac;
+}
+// center
+%text-center {
+    text-align: center;
+}
+%abs-auto {
+    @extend %abpos-0;
+    margin: auto;
+}
+%mg-auto{
+    margin: auto;
+}
+%block-mg-auto {
+    display: block;
+    margin: auto;
+}
+%inline-center-middle {
+    text-align: center;
+    vertical-align: middle;
+}
+@mixin fs-lh($fs:initial, $lh: $fs) {
+    font-size: $fs;
+    line-height: $lh;
+}
+// size
+@mixin size($w, $h: $w) {
+    width: $w;
+    height: $h;
+}
+%w50 {
+    width: 50%;
+}
+%w100 {
+    width: 100%;
+}
+%wh100 {
+    @extend %h100;
+    @extend %w100;
+}
+%h100 {
+    height: 100%;
+}
+%mh-100vh {
+    min-height: 100vh;
+}
+// fixed
+@mixin fixed-xy ($l:0 , $t:0) {
+    position: fixed;
+    left: $l;
+    top: $t;
+}
+%fixed-y-50vh{
+    position: fixed;
+    top: 50vh;
+    transform: translateY(-50%);
+}
+// pseudo element
+@mixin pseudo-img-bg($imgURL, $background: no-repeat) {
+    content: "";
+    background: url($imgURL) $background;
+}
+// scroll
+%hide-scroll-x {
+    overflow-x: hidden;
 }
