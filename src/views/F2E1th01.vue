@@ -7,8 +7,6 @@
             @click="currentListPage=listPage.value")
           | {{listPage.name}}
     .content
-      //- .test
-      //-   p(v-for="task in tasks") {{task}}
       .panel-add
         el-input.add-task(v-if="editStatus === 'edit'" placeholder="＋Add Task" :class="{'warn': isWarn}"
                           @focus="defaultCacheTask(); editStatus = 'add';" @keyup.enter.native="addTask()")
@@ -17,25 +15,18 @@
       .panel-editor(v-show="editStatus")
         section.editor-title.task-title(:class="{'edit': editStatus === 'edit'}")
           p.task-input
-            el-checkbox(v-if="editStatus === 'edit'" v-model="cacheTask.isCompleted" @click.native="clickCompleted(cacheTask)")
+            el-checkbox(v-if="editStatus === 'edit'" v-model="cacheTask.isCompleted" @click.prevent.native="clickCompleted(cacheTask)")
             input.input(type="text" v-model="cacheTask.name" placeholder="Type Something Here" :class="{'warn': isWarn}"
                         @keyup.enter="editStatus === 'edit' ? updateTask(cacheTask) : addTask()")
           p.task-btns
-            button.btn-important
-              fas-icon(:icon="[cacheTask.isStar ? 'fas' : 'far', 'star']"
-                        @click="clickStar(task)")
+            button.btn-important(@click="clickStar(cacheTask)")
+              fas-icon(:icon="[cacheTask.isStar ? 'fas' : 'far', 'star']")
         section.editor-date
           p
             fas-icon(:icon="['far', 'calendar-alt']")
             | Deadline
           el-date-picker(v-model="cacheTask.date" type="date" placeholder="yyyy/mm/dd" format="yyyy/MM/dd"
                         :picker-options={"firstDayOfWeek": 1})
-          //- el-time-select(v-model="cacheTask.time" :picker-options="{start: \'08:30\',step: \'00:15\',end: \'18:30\'}" placeholder="time").
-        //- section.editor-file
-        //-   fas-icon(:icon="['far', 'file']")
-        //-   | File
-        //-   el-button(type='info') 
-        //-     fas-icon(:icon="['fas', 'plus']")
         section.editor-comment
           p
             fas-icon(:icon="['far', 'comment-dots']")
@@ -59,9 +50,8 @@
               input(type="text" placeholder="Type Something Here" class="input" :value="task.name" readonly
                     @dblclick="editTask(task); editStatus = null || 'edit'")
             p.task-btns
-              button.btn-important
-                fas-icon(v-show="!task.isCompleted" :icon="[task.isStar ? 'fas' : 'far', 'star']"
-                        @click="clickStar(task)")
+              button.btn-important(@click="clickStar(task)")
+                fas-icon(v-show="!task.isCompleted" :icon="[task.isStar ? 'fas' : 'far', 'star']")
               button.btn-edit(@click="editTask(task)")
                 fas-icon(:icon="[task.isCompleted ? 'fas' : 'far', 'edit']")
               button.btn-del(@click="delTask(task)")
@@ -101,7 +91,7 @@ export default {
       ],
       currentListPage: 'all',
       filteredTasksMsg: '',
-      editStatus: null, // add / edit / null'
+      editStatus: null, // add / edit / null
       cacheTask: {},
       tasks: [],
       isWarn: false
@@ -255,33 +245,33 @@ export default {
 </script>
 
 <style lang="scss">
-
 // common style (mixin / extend)
 %max-width {
   max-width: var(--width-content-max);
 }
-%mg-auto{
+%mg-auto {
   margin: auto;
 }
-%w100{
+%w100 {
   width: 100%;
 }
-%mh-100vh{
+%mh-100vh {
   min-height: 100vh;
 }
-%w50{
+%w50 {
   width: 50%;
 }
-%text-center{
+%text-center {
   text-align: center;
 }
-
-%flex{
+%flex {
   display: flex;
 }
-
+@mixin size-w-h($width, $height:$width) {
+    width: $width;
+    height: $height;
+}
 // custom-default style
-
 button {  // button style reset
   border: none;
   background: none;
@@ -303,11 +293,13 @@ button {  // button style reset
   --color-gray-3: #E1E1E1;
   --color-gray-4: #F2F2F2;
   --width-content-max: 620px;
+  font-size: 12px;
 }
 
 // style
 
 .f2e1-01 {
+  font-size: 1rem;
   &.container{
     font-family: 'Roboto', sans-serif;
     background-color: var(--color-gray-3);
@@ -349,13 +341,10 @@ button {  // button style reset
     &:not(.edit) {
       .task-title {
         input[type="text"]{
-          border: none;  //test
-          background: none; //test
+          border: none;
+          background: none;
         }
       }
-    }
-    &.edit {
-
     }
     &.completed {
       .task-icons {
@@ -364,8 +353,8 @@ button {  // button style reset
       .task-title {
         input[type="text"] {
           text-decoration:line-through;
-          border: none;  //test
-          background: none; //test
+          border: none;
+          background: none;
           color: #AAA;
         }
       }
@@ -373,25 +362,32 @@ button {  // button style reset
   }
   .task-title {
     display: flex;
-
     .task-input {
       flex: 1;
       @extend %flex;
       @extend %w100;
+      align-items: center;
       input[type="text"] {
         @extend %w100;
+        font-size: 1.2rem;
+        line-height: 2rem;
       }
     }
     .task-btns {
       button {
-        width: 2rem;
+        @include size-w-h(2.2rem);
       }
+    }
+  }
+  .task-btns {
+    svg {
+      color: var(--color-gray-1);
     }
   }
   .task-icons {
     color: var(--color-gray-1);
   }
-  .btn-important svg[data-prefix="fas"] {
+  svg[data-prefix="fas"][data-icon="star"] {
     color: var(--color-yellow-1);
   }
   .panel-add {
@@ -457,11 +453,14 @@ button {  // button style reset
       padding: 10px 20px 10px 40px;
       background-color: var(--color-gray-4);
       .task-input {
-        margin-left: -24px;
+        margin-left: -2rem;
+        .el-checkbox {
+          margin-right: .5rem;
+        }
       }
       input[readonly] {
-        border: none;  //test
-        background: none; //test
+        border: none;
+        background: none;
       }
       &.edit {
         background-color: var(--color-yellow-2);
@@ -471,11 +470,18 @@ button {  // button style reset
   .panel-list {
     .task-btns {
       svg {
-        color: var(--color-gray-1);
-        &:hover{
+        &:hover {
           cursor: pointer;
           filter: brightness(0.2);
         }
+      }
+    }
+    .task-icons {
+      span[class^="info"] {
+        margin-right: 1.2rem;
+      }
+      svg {
+        margin-right: .2rem;
       }
     }
   }
