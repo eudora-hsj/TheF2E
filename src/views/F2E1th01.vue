@@ -245,32 +245,6 @@ export default {
 </script>
 
 <style lang="scss">
-// common style (mixin / extend)
-%max-width {
-  max-width: var(--width-content-max);
-}
-%mg-auto {
-  margin: auto;
-}
-%w100 {
-  width: 100%;
-}
-%mh-100vh {
-  min-height: 100vh;
-}
-%w50 {
-  width: 50%;
-}
-%text-center {
-  text-align: center;
-}
-%flex {
-  display: flex;
-}
-@mixin size-w-h($width, $height:$width) {
-    width: $width;
-    height: $height;
-}
 // custom-default style
 button {  // button style reset
   border: none;
