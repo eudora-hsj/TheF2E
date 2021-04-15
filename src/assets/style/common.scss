@@ -52,7 +52,7 @@
     @extend %flex;
     flex-direction: column;
 }
-%flex-xy-center {
+%flex-center {
     @extend %flex;
     @extend %justify-content-center;
     @extend %align-items-center ;
