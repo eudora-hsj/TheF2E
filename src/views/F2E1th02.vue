@@ -100,10 +100,14 @@ export default {
   },
   methods: {
     dataGet () {
-      this.$http.get(`${this.HOST}${this.api}`).then((res) => {
-        this.datas = [...res.data.data]
-        this.customDatas()
-      })
+      this.$http.get(`${this.HOST}${this.api}`)
+        .then((res) => {
+          this.datas = [...res.data.data]
+          this.customDatas()
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     customDatas () {
       this.datas.forEach(data => {

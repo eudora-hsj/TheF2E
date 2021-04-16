@@ -286,7 +286,7 @@ export default {
         @extend %text-center;
         color: var(--color-sub);
         line-height: 2.2rem;
-        font-size: 1rem;
+        font-size: 1.2rem;
         flex: 1;
         cursor: pointer;
         &.active{
