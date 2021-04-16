@@ -59,7 +59,7 @@ export default {
   },
   watch: {
     isCheckedAll: function () { // can't use arrow
-      this.locationChecked = this.isCheckedAll ? this.locations : []
+      this.locationChecked = this.isCheckedAll ? [...this.locations] : []
     }
   },
   computed: {
