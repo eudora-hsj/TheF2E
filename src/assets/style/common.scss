@@ -3,7 +3,7 @@
 }
 
 // reset
-%border-box {
+*{
     box-sizing: border-box;
 }
 // flex
@@ -57,6 +57,14 @@
     @extend %justify-content-center;
     @extend %align-items-center ;
 }
+%flex-jc-center {
+    @extend %flex;
+    @extend %justify-content-center;
+}
+%flex-ai-center {
+    @extend %flex;
+    @extend %align-items-center ;
+}
 %flex-col {
     position: relative;
     flex-basis: 0;
@@ -73,10 +81,20 @@
 %abs{
     position: absolute;
 }
-@mixin abpos($l: initial, $t: initial) {
+@mixin abpos-lt($l: initial, $t: initial) {
     @extend %abs;
     left: $l;
     top: $t;
+}
+@mixin abpos-rt($r: initial, $t: initial) {
+    @extend %abs;
+    right: $r;
+    top: $t;
+}
+@mixin abpos-rb($r: initial, $b: initial) {
+    @extend %abs;
+    right: $r;
+    bottom: $b;
 }
 %abs-x-center {
     @extend %abs;
@@ -172,4 +190,8 @@
 // scroll
 %hide-scroll-x {
     overflow-x: hidden;
+}
+// cursor
+%pointer {
+    cursor: pointer;
 }
