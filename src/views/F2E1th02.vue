@@ -28,7 +28,8 @@
               span.tag(v-show="locationChecked.length" v-for="location in locationChecked" :key="location") {{location}}
                 fas-icon.del(icon="times" @click="locationChecked.splice(locationChecked.indexOf(location), 1)")
           .list-cards
-            section.card(v-for="data in filteredDatas" :key="data.id")
+            section.card(v-for="(data, idx) in filteredDatas" :key="data.id"
+                        v-show="pageFirst <= idx + 1 && idx + 1 <= pageLast")
               .card-img
                 img(:src="data.cover_image" :alt="data.title")
               .card-body
@@ -41,6 +42,13 @@
                 p.mrt {{data.mrt}}
                 p.type {{data.type}}
                 p.updated #[fas-icon(icon="calendar-alt")] {{data.updated_at}}
+            .pagination
+              el-pagination(background layout='prev, pager, next'
+                            :pager-count="pagination.pagerCount"
+                            :page-size="pagination.pageSize"
+                            :current-page.sync="pagination.currentPage"
+                            :total='filteredDatas.length'
+                            @current-change="handleCurrentChange").
 </template>
 
 <script>
@@ -54,7 +62,12 @@ export default {
       searchAny: '',
       searchLocation: '',
       locationChecked: [],
-      isCheckedAll: false
+      isCheckedAll: false,
+      pagination: {
+        currentPage: 1,
+        pageSize: 10,
+        pagerCount: 11 // 5 ~ 21 間的奇數
+      }
     }
   },
   watch: {
@@ -93,6 +106,12 @@ export default {
         return acc.includes(item) || !item ? acc : [...acc, item]
       }, []
       ).sort()
+    },
+    pageFirst () {
+      return (this.pagination.currentPage - 1) * this.pagination.pageSize + 1
+    },
+    pageLast () {
+      return this.pageFirst + this.pagination.pageSize - 1
     }
   },
   created () {
@@ -120,6 +139,13 @@ export default {
         // updated formate
         data.updated_at = data.updated_at.substr(0, 10)
       })
+    },
+    handleCurrentChange () {
+      this.goTop()
+    },
+    goTop () {
+      document.body.scrollTop = 0 // For Safari
+      document.documentElement.scrollTop = 0 // For Chrome, Firefox, IE and Opera
     }
   }
 }
@@ -327,6 +353,10 @@ export default {
               @include abpos-rb(10px, 10px);
             }
           }
+        }
+        .pagination {
+          @extend %text-center;
+          margin: 2rem auto 2.5rem;
         }
       }
     }
