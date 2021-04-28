@@ -1,7 +1,7 @@
 <template lang="pug">
   .f2e1-01.content
     .banner
-      ul
+      ul {{test}}
         li(v-for="listPage in listPages" :key="listPage.value"
             :class="{'active': currentListPage === listPage.value}"
             @click="currentListPage=listPage.value")
@@ -132,6 +132,9 @@ export default {
         case 'completed':
           return this.sortedTasks.filter(task => task.isCompleted)
       }
+    },
+    test () {
+      return this.$store.state.test
     },
     // count tasks
     filteredTasksCount () {
