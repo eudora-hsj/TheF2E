@@ -1,7 +1,7 @@
 <template lang="pug">
   .f2e1-01.content
     .banner
-      ul {{test}}
+      ul
         li(v-for="listPage in listPages" :key="listPage.value"
             :class="{'active': currentListPage === listPage.value}"
             @click="currentListPage=listPage.value")

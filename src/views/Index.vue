@@ -33,7 +33,10 @@ export default {
         {path: 'th2-07', checked: false, subject: '匿名聊天室'},
         {path: 'th2-08', checked: false, subject: '雲端硬碟'},
         {path: 'th2-09', checked: false, subject: '筆記軟體'},
-        {path: 'th2-10', checked: false, subject: '口罩地圖'}
+        {path: 'th2-10', checked: false, subject: '口罩地圖'},
+        {path: 'th3-01', checked: false, subject: '台灣旅遊景點導覽 '},
+        {path: 'th3-02', checked: false, subject: '自行車道地圖資訊整合網'},
+        {path: 'th3-03', checked: false, subject: '全台公車動態時刻查詢應用服務'}
       ]
     }
   }
