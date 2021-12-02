@@ -17,11 +17,13 @@
     "@fortawesome/vue-fontawesome": "^2.0.2",
     "animate.css": "^4.1.1",
     "element-ui": "^2.15.1",
+    "leaflet": "^1.7.1",
     "pug": "^3.0.2",
     "pug-loader": "^2.4.0",
     "reset-css": "^5.0.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
+    "vue2-leaflet": "^2.7.1",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
